@@ -1,6 +1,5 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const Enmap = require("enmap")
 const fs = require("fs");
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
@@ -53,88 +52,26 @@ fs.readdir("./events/", (err, files) => {
   });
 });
 
-client.commands = new Enmap();
+client.commands = new Discord.Collection();
 
-fs.readdir("./commands/", (err, files) => {
-  if (err) return console.error(err);
-  files.forEach(file => {
-    if (!file.endsWith(".js")) return;
-    let props = require(`./commands/${file}`);
-    let commandName = file.split(".")[0];
-    client.commands.set(commandName, props);
+// Recherche de toutes les commandes
+fs.readdir("./commands/", (err, content) => {
+  if(err) console.log(err);
+  if(content.length < 1) return console.log('Veuillez créer des dossiers dans le dossier commands !');
+  var groups = [];
+  content.forEach(element => {
+      if(!element.includes('.')) groups.push(element); // Si c'est un dossier
   });
-});
-
-client.commands = new Enmap();
-
-fs.readdir("./commands/utilitaires/", (err, files) => {
-  if (err) return console.error(err);
-  files.forEach(file => {
-    if (!file.endsWith(".js")) return;
-    let props = require(`./commands/utilitaires/${file}`);
-    let commandName = file.split(".")[0];
-    client.commands.set(commandName, props);
-  });
-});
-
-client.commands = new Enmap();
-
-fs.readdir("./commands/admin/", (err, files) => {
-  if (err) return console.error(err);
-  files.forEach(file => {
-    if (!file.endsWith(".js")) return;
-    let props = require(`./commands/admin/${file}`);
-    let commandName = file.split(".")[0];
-    client.commands.set(commandName, props);
-  });
-});
-
-client.commands = new Enmap();
-
-fs.readdir("./commands/modo/", (err, files) => {
-  if (err) return console.error(err);
-  files.forEach(file => {
-    if (!file.endsWith(".js")) return;
-    let props = require(`./commands/modo/${file}`);
-    let commandName = file.split(".")[0];
-    client.commands.set(commandName, props);
-  });
-});
-
-client.commands = new Enmap();
-
-fs.readdir("./commands/fun/", (err, files) => {
-  if (err) return console.error(err);
-  files.forEach(file => {
-    if (!file.endsWith(".js")) return;
-    let props = require(`./commands/fun/${file}`);
-    let commandName = file.split(".")[0];
-    client.commands.set(commandName, props);
-  });
-});
-
-
-client.commands = new Enmap();
-
-fs.readdir("./commands/divertissement/", (err, files) => {
-  if (err) return console.error(err);
-  files.forEach(file => {
-    if (!file.endsWith(".js")) return;
-    let props = require(`./commands/divertissement/${file}`);
-    let commandName = file.split(".")[0];
-    client.commands.set(commandName, props);
-  });
-});
-
-client.commands = new Enmap();
-
-fs.readdir("./commands/economy/", (err, files) => {
-  if (err) return console.error(err);
-  files.forEach(file => {
-    if (!file.endsWith(".js")) return;
-    let props = require(`./commands/economy/${file}`);
-    let commandName = file.split(".")[0];
-    client.commands.set(commandName, props);
+  groups.forEach(folder => {
+      fs.readdir("./commands/"+folder, (e, files) => {
+          let js_files = files.filter(f => f.split(".").pop() === "js");
+          if(js_files.length < 1) return console.log('Veuillez créer des fichiers dans le dossier "'+folder+'" !');
+          if(e) console.log(e);
+          js_files.forEach(element => {
+              let props = require('./commands/'+folder+'/'+element);
+              client.commands.set(element.split('.')[0], props);
+          });
+      });
   });
 });
 
