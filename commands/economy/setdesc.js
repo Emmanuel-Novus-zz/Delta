@@ -10,21 +10,9 @@ exports.run = (client, message, args) => {
     var author = message.author.id;
     if (!args[0]) return message.channel.send("<:false:551460099600678944> **Merci de donner une description correcte s'il vous plaît.**")
     if (!db.get("description").find({ auteur: author }).value()) {
-
         db.get("description").push({ auteur: author, description: desc }).write()
-
       } else {
-
-        var userdescdb = db.get("description").filter({ auteur: author }).find('description').value()
-
-        var description = Object.values(userdescdb)
-
         db.get("description").find({ auteur: author }).assign({ auteur: author, description: desc }).write()   
 }
 message.channel.send("<:true:551460100347396107> **Votre description a bien été actualisé avec succès.**")
-}
-
-
-module.exports.help = {
-    name: "setdesc"
 }
